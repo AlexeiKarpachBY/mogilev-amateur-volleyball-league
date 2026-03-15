@@ -33,7 +33,7 @@ const MATCH_RESULTS = {
         {"match_id": 9, "gameweek": 3, "home": "Макиато", "away": "Сетка 37", "played": true, "sets": {"home": 2, "away": 1}, "set_scores": [{ "home":25, "away": 27 },{ "home": 25, "away": 23 },{ "home": 25, "away": 16 }], "points": {"home": 2, "away": 1}},
         {"match_id": 10, "gameweek": 3, "home": "Серволюкс", "away": "Отцы и дети", "played": true, "sets": {"home": 0, "away": 3}, "set_scores": [{ "home":13, "away": 25 },{ "home": 16, "away": 25 },{ "home": 18, "away": 25 }], "points": {"home": 0, "away": 3}},
         {"match_id": 11, "gameweek": 3, "home": "33", "away": "Могилевгражданпроект", "played": true, "sets": {"home": 0, "away": 3}, "set_scores": [{ "home":22, "away": 25 },{ "home": 21, "away": 25 },{ "home": 18, "away": 25 }], "points": {"home": 0, "away": 3}},
-        {"match_id": 12, "gameweek": 3, "home": "Могилевгипрозем", "away": "Dream team", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
+        {"match_id": 12, "gameweek": 3, "home": "Могилевгипрозем", "away": "Dream team", "played": true, "sets": {"home": 1, "away": 2}, "set_scores": [{ "home":19, "away": 25 },{ "home": 20, "away": 25 },{ "home": 25, "away": 16 }], "points": {"home": 1, "away": 2}},
 
         // Тур 4
         {"match_id": 13, "gameweek": 4, "home": "Dream team", "away": "Могилевгражданпроект", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
