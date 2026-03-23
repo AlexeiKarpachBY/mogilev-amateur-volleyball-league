@@ -42,7 +42,7 @@ const MATCH_RESULTS = {
         {"match_id": 16, "gameweek": 4, "home": "33", "away": "Серволюкс", "played": true, "sets": {"home": 3, "away": 0}, "set_scores": [{ "home":25, "away": 19 },{ "home": 25, "away": 17 },{ "home": 25, "away": 22 }], "points": {"home": 3, "away": 0}},
 
         // Тур 5
-        {"match_id": 17, "gameweek": 5, "home": "Макиато", "away": "Могилевгражданпроект", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
+
         {"match_id": 18, "gameweek": 5, "home": "Серволюкс", "away": "Могилевгипрозем", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
         {"match_id": 19, "gameweek": 5, "home": "Dream team", "away": "33", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
         {"match_id": 20, "gameweek": 5, "home": "Сетка 37", "away": "Отцы и дети", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
@@ -54,6 +54,7 @@ const MATCH_RESULTS = {
         {"match_id": 24, "gameweek": 6, "home": "Отцы и дети", "away": "Dream team", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
 
         // Тур 7
+        {"match_id": 17, "gameweek": 5, "home": "Макиато", "away": "Могилевгражданпроект", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
         {"match_id": 25, "gameweek": 7, "home": "Макиато", "away": "Серволюкс", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
         {"match_id": 26, "gameweek": 7, "home": "Dream team", "away": "Сетка 37", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
         {"match_id": 27, "gameweek": 7, "home": "33", "away": "Отцы и дети", "played": false, "sets": {"home": null, "away": null}, "set_scores": [], "points": {"home": null, "away": null}},
