@@ -521,6 +521,12 @@ function showStandingsTable() {
                 'Поражение 1-2 → <strong style="color: #fbbf24;">1 очко</strong> | ' +
                 'Поражение 0-3 → <strong style="color: #ef4444;">0 очков</strong>' +
             '</p>' +
+            '<p style="margin-top: 10px; color: #00d4ff; font-size: 0.95em; font-weight: 600;">' +
+                '🔢 Тай-брейк (при равенстве очков):' +
+            '</p>' +
+            '<p style="margin-top: 5px; color: #ccc; font-size: 0.85em;">' +
+                'Очки → Победы → Разница партий → Партий выиграно → Разница мячей → Мячей забито' +
+            '</p>' +
             (totalPlayedMatches === 0 ? '<p style="margin-top: 15px; color: #888; font-size: 0.85em;">* Таблица обновится после проведения первых матчей</p>' : '') +
         '</div>' +
         '</div>';

@@ -84,57 +84,13 @@ function calculateStandings() {
     return sortStandings(standings);
 }
 
-// Получить результат личных встреч между двумя командами
-function getHeadToHeadResult(teamA, teamB) {
-    // Находим все сыгранные матчи между этими двумя командами
-    const h2hMatches = MATCH_RESULTS.results.filter(match =>
-        match.played &&
-        ((match.home === teamA && match.away === teamB) ||
-         (match.home === teamB && match.away === teamA))
-    );
-
-    if (h2hMatches.length === 0) return 0;
-
-    let pointsA = 0;
-    let pointsB = 0;
-    let setsDiffA = 0;
-    let pointsDiffA = 0;
-
-    h2hMatches.forEach(match => {
-        if (match.home === teamA) {
-            pointsA += match.points.home;
-            pointsB += match.points.away;
-            setsDiffA += (match.sets.home - match.sets.away);
-            match.set_scores.forEach(set => {
-                pointsDiffA += (set.home - set.away);
-            });
-        } else {
-            pointsA += match.points.away;
-            pointsB += match.points.home;
-            setsDiffA += (match.sets.away - match.sets.home);
-            match.set_scores.forEach(set => {
-                pointsDiffA += (set.away - set.home);
-            });
-        }
-    });
-
-    // Сравниваем по очкам в личных встречах
-    if (pointsA !== pointsB) return pointsB - pointsA; // > 0 значит B лучше
-
-    // По разнице партий в личных встречах
-    if (setsDiffA !== 0) return -setsDiffA; // > 0 значит A лучше
-
-    // По разнице очков в личных встречах
-    if (pointsDiffA !== 0) return -pointsDiffA;
-
-    return 0;
-}
-
 // Сортировка турнирной таблицы по правилам
-// 1. Набранные очки
-// 2. Разница выигранных и проигранных партий
-// 3. Разница набранных очков в партиях
-// 4. Результат личных встреч (при полном равенстве первых трёх показателей)
+// 1. Турнирные очки
+// 2. Количество побед
+// 3. Разница партий (+/-)
+// 4. Количество выигранных партий
+// 5. Разница очков в партиях
+// 6. Количество выигранных очков в партиях
 function sortStandings(standings) {
     return standings.sort((a, b) => {
         // 1. По турнирным очкам (главный критерий)
@@ -142,18 +98,28 @@ function sortStandings(standings) {
             return b.tournament_points - a.tournament_points;
         }
 
-        // 2. По разнице партий (выигранные минус проигранные)
+        // 2. По количеству побед
+        if (b.won !== a.won) {
+            return b.won - a.won;
+        }
+
+        // 3. По разнице партий (выигранные минус проигранные)
         if (b.sets_diff !== a.sets_diff) {
             return b.sets_diff - a.sets_diff;
         }
 
-        // 3. По разнице очков в партиях (набранные минус пропущенные)
+        // 4. По количеству выигранных партий
+        if (b.sets_won !== a.sets_won) {
+            return b.sets_won - a.sets_won;
+        }
+
+        // 5. По разнице очков в партиях (набранные минус пропущенные)
         if (b.points_diff !== a.points_diff) {
             return b.points_diff - a.points_diff;
         }
 
-        // 4. По результатам личных встреч
-        return getHeadToHeadResult(a.team, b.team);
+        // 6. По количеству выигранных очков в партиях
+        return b.points_won - a.points_won;
     });
 }
 
