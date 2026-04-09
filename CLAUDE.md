@@ -25,7 +25,7 @@ There are no build, lint, or test commands — the project has no toolchain conf
 Scripts are loaded synchronously in this dependency order:
 
 1. `js/scheduleData.js` — exports `SCHEDULE_DATA` global constant (14 gameweeks × 4 matches)
-2. `js/matchResults.js` — exports `MATCH_RESULTS` global object (`.results` array of 56 match objects) and `updateMatchResult()`
+2. `js/matchResults.js` — exports `MATCH_RESULTS` global object (`.results` array of 56 match objects)
 3. `js/standings.js` — exports `calculateStandings()`, `sortStandings()`, and `refreshStandings()`; depends on MATCH_RESULTS
 4. `js/teamCard.js` — exports `getTeamStats()` and `createTeamCardHTML()`; depends on SCHEDULE_DATA + MATCH_RESULTS
 5. `js/playoff.js` — exports `PLAYOFF_DATA`, `showPlayoff()`, and SVG connector drawing functions; depends on MATCH_RESULTS + currentStandings
@@ -42,9 +42,7 @@ All inter-module communication happens via globals. There is no import/export sy
 
 ### Data Layer
 
-Match results live in `js/matchResults.js` as `MATCH_RESULTS.results`. To record a result, call `updateMatchResult(matchId, homeSets, awaySets, setScores)` or manually set `played: true`, populate `sets` (home/away set counts), `set_scores` (array of per-set scores), and `points`. Each match always has exactly 3 sets played regardless of outcome. See `docs/STANDINGS_GUIDE.md` for the exact format.
-
-`data/schedule.json` and `data/team-info.json` are static reference files but are **not loaded at runtime** — the app reads from the JS constants (`SCHEDULE_DATA` in `scheduleData.js`) instead.
+Match results live in `js/matchResults.js` as `MATCH_RESULTS.results`. To record a result, manually set `played: true`, populate `sets` (home/away set counts), `set_scores` (array of per-set scores), and `points`. Each match always has exactly 3 sets played regardless of outcome. See `docs/STANDINGS_GUIDE.md` for the exact format.
 
 ### CSS Module System
 

@@ -59,38 +59,6 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2), 0 4px 12px rgba(0, 212, 255, 0.3);
 }
 
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.tab-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-.tab-btn:hover {
-    background: rgba(0,212,255,0.3);
-}
-
-.tab-btn.active {
-    background: #00d4ff;
-    color: #1a1a2e;
-    font-weight: 700;
-}
-
 @media (max-width: 768px) {
     .controls {
         flex-direction: column;
@@ -98,7 +66,7 @@ select:focus {
         gap: 15px;
     }
 
-    select, .tab-btn {
+    select {
         min-height: 44px;
         font-size: 16px;
     }

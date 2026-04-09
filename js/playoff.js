@@ -613,7 +613,7 @@ function showPlayoff() {
 
     html += '</div>';
 
-    document.getElementById('scheduleContainer').innerHTML = html;
+    _scheduleContainer.innerHTML = html;
 
     requestAnimationFrame(function() {
         requestAnimationFrame(function() {

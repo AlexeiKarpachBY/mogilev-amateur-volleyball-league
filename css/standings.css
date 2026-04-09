@@ -196,14 +196,6 @@
     border: 2px solid #00e5ff;
 }
 
-.legend-silver {
-    background: rgba(192, 192, 192, 0.2);
-}
-
-.legend-red {
-    background: rgba(255, 82, 82, 0.2);
-}
-
 /* ============= ПРОГРЕСС-БАР ТУРНИРА ============= */
 
 .standings-info {

@@ -33,12 +33,16 @@ function initializeStandings() {
 function calculateStandings() {
     const standings = initializeStandings();
 
+    // Map для O(1) поиска команды по имени
+    const standingsMap = new Map();
+    standings.forEach(team => standingsMap.set(team.team, team));
+
     // Обработка всех сыгранных матчей
     MATCH_RESULTS.results.forEach(match => {
         if (!match.played) return;
 
-        const homeTeam = standings.find(t => t.team === match.home);
-        const awayTeam = standings.find(t => t.team === match.away);
+        const homeTeam = standingsMap.get(match.home);
+        const awayTeam = standingsMap.get(match.away);
 
         if (!homeTeam || !awayTeam) return;
 
@@ -72,12 +76,12 @@ function calculateStandings() {
         // Обновление турнирных очков
         homeTeam.tournament_points += match.points.home;
         awayTeam.tournament_points += match.points.away;
-    });
 
-    // Расчет разницы
-    standings.forEach(team => {
-        team.sets_diff = team.sets_won - team.sets_lost;
-        team.points_diff = team.points_won - team.points_lost;
+        // Обновление разницы партий и очков
+        homeTeam.sets_diff = homeTeam.sets_won - homeTeam.sets_lost;
+        homeTeam.points_diff = homeTeam.points_won - homeTeam.points_lost;
+        awayTeam.sets_diff = awayTeam.sets_won - awayTeam.sets_lost;
+        awayTeam.points_diff = awayTeam.points_won - awayTeam.points_lost;
     });
 
     // Сортировка таблицы

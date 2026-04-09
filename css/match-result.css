@@ -72,6 +72,9 @@
     background: rgba(0, 0, 0, 0.25);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transform: scale(0.9);
+    animation: resultAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
 }
 
 /* ===== Счёт по сетам (основной крупный) ===== */
@@ -179,13 +182,6 @@
     }
 }
 
-/* ===== Анимация появления результата ===== */
-.match-result {
-    opacity: 0;
-    transform: scale(0.9);
-    animation: resultAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
-}
-
 @keyframes resultAppear {
     0% {
         opacity: 0;
@@ -200,12 +196,3 @@
     }
 }
 
-/* ===== Reduced motion ===== */
-@media (prefers-reduced-motion: reduce) {
-    .match-result,
-    .team.winner::after {
-        animation: none;
-        opacity: 1;
-        transform: none;
-    }
-}

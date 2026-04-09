@@ -39,35 +39,12 @@ function getTeamStats(teamName) {
     var homeMatches = teamMatches.filter(function(m) { return m.isHome; });
     var awayMatches = teamMatches.filter(function(m) { return !m.isHome; });
 
-    // Расчет побед/поражений
-    var wins = teamMatches.filter(function(m) {
-        return m.played && (
-            (m.isHome && m.sets.home > m.sets.away) ||
-            (!m.isHome && m.sets.away > m.sets.home)
-        );
-    }).length;
-
-    var losses = teamMatches.filter(function(m) {
-        return m.played && (
-            (m.isHome && m.sets.home < m.sets.away) ||
-            (!m.isHome && m.sets.away < m.sets.home)
-        );
-    }).length;
-
+    var wins = standing.won;
+    var losses = standing.lost;
     var winRate = standing.played > 0 ? Math.round((wins / standing.played) * 100) : 0;
 
-    // Статистика по рейтингам
     var playedHomeMatches = homeMatches.filter(function(m) { return m.played; });
-    var avgPointsHome = playedHomeMatches.length > 0 ?
-        (playedHomeMatches.reduce(function(sum, m) {
-            return sum + m.set_scores.reduce(function(s, ss) { return s + ss.home; }, 0);
-        }, 0) / playedHomeMatches.length).toFixed(1) : 0;
-
     var playedAwayMatches = awayMatches.filter(function(m) { return m.played; });
-    var avgPointsAway = playedAwayMatches.length > 0 ?
-        (playedAwayMatches.reduce(function(sum, m) {
-            return sum + m.set_scores.reduce(function(s, ss) { return s + ss.away; }, 0);
-        }, 0) / playedAwayMatches.length).toFixed(1) : 0;
 
     // Статистика дома vs в гостях
     var homeStats = {
@@ -92,22 +69,6 @@ function getTeamStats(teamName) {
         points: playedAwayMatches.reduce(function(sum, m) { return sum + m.points.away; }, 0)
     };
 
-    // Топ противники
-    var opponentStats = {};
-    teamMatches.forEach(function(m) {
-        if (!opponentStats[m.opponent]) {
-            opponentStats[m.opponent] = { played: 0, won: 0, lost: 0, points: 0 };
-        }
-        opponentStats[m.opponent].played++;
-        if (m.played) {
-            var isWin = (m.isHome && m.sets.home > m.sets.away) ||
-                        (!m.isHome && m.sets.away > m.sets.home);
-            if (isWin) opponentStats[m.opponent].won++;
-            else opponentStats[m.opponent].lost++;
-            opponentStats[m.opponent].points += m.isHome ? m.points.home : m.points.away;
-        }
-    });
-
     return {
         standing: standing,
         teamMatches: teamMatches.sort(function(a, b) { return a.match_id - b.match_id; }),
@@ -115,10 +76,7 @@ function getTeamStats(teamName) {
         losses: losses,
         winRate: winRate,
         homeStats: homeStats,
-        awayStats: awayStats,
-        avgPointsHome: avgPointsHome,
-        avgPointsAway: avgPointsAway,
-        opponentStats: opponentStats
+        awayStats: awayStats
     };
 }
 
@@ -138,10 +96,16 @@ function createTeamCardHTML(teamName) {
     var winRate = stats.winRate;
     var homeStats = stats.homeStats;
     var awayStats = stats.awayStats;
-    var opponentStats = stats.opponentStats;
 
-    var playedMatches = teamMatches.filter(function(m) { return m.played; });
-    var upcomingMatches = teamMatches.filter(function(m) { return !m.played; }).slice(0, 3);
+    var playedMatches = [];
+    var upcomingMatches = [];
+    teamMatches.forEach(function(m) {
+        if (m.played) {
+            playedMatches.push(m);
+        } else if (upcomingMatches.length < 3) {
+            upcomingMatches.push(m);
+        }
+    });
 
     var safeTeamName = escapeHtml(teamName);
 
@@ -283,18 +247,13 @@ function createTeamCardHTML(teamName) {
             '<div class="upcoming-matches">';
 
     if (upcomingMatches.length > 0) {
+        var scheduleMap = {};
+        SCHEDULE_DATA.schedule.forEach(function(gw) {
+            gw.matches.forEach(function(m) { scheduleMap[m.match_id] = m; });
+        });
+
         upcomingMatches.forEach(function(match) {
-            var matchSchedule = null;
-            for (var g = 0; g < SCHEDULE_DATA.schedule.length; g++) {
-                var gw = SCHEDULE_DATA.schedule[g];
-                for (var m = 0; m < gw.matches.length; m++) {
-                    if (gw.matches[m].match_id === match.match_id) {
-                        matchSchedule = gw.matches[m];
-                        break;
-                    }
-                }
-                if (matchSchedule) break;
-            }
+            var matchSchedule = scheduleMap[match.match_id] || null;
 
             html += '<div class="upcoming-match-item">' +
                 '<div class="upcoming-opponent">' + escapeHtml(match.opponent) + '</div>' +
@@ -320,10 +279,10 @@ function createTeamCardHTML(teamName) {
  * Показать карточку команды с анимацией
  */
 function showTeamCard(teamName) {
-    var container = document.getElementById('scheduleContainer');
+    var container = _scheduleContainer;
 
     // Анимированный переход
-    if (typeof TRANSITION_CONFIG !== 'undefined' && TRANSITION_CONFIG.enabled) {
+    if (typeof TRANSITION_CONFIG !== 'undefined') {
         container.classList.add('fade-out');
 
         setTimeout(function() {

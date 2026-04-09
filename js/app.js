@@ -4,10 +4,15 @@ let scheduleData = null;
 // Текущий активный режим просмотра
 let currentViewMode = 'gameweek';
 
+// Кэшированная ссылка на основной контейнер контента
+var _scheduleContainer = null;
+
+// Кэшированный список команд
+var _teamsList = null;
+
 // Настройки анимаций переходов
 const TRANSITION_CONFIG = {
-    duration: 300, // мс
-    enabled: true
+    duration: 300 // мс
 };
 
 // Инициализация приложения при загрузке страницы
@@ -18,6 +23,7 @@ window.addEventListener('load', function() {
 });
 
 function initializeApp() {
+    _scheduleContainer = document.getElementById('scheduleContainer');
     try {
         populateGameweekSelect();
         populateAllTeamSelects();
@@ -29,8 +35,7 @@ function initializeApp() {
         showGameweek(currentGameweek);
     } catch (error) {
         console.error('Error initializing app:', error);
-        // Fallback: показываем первый тур из реальных данных
-        showStaticGameweek();
+        showGameweek(1);
     }
 }
 
@@ -108,27 +113,28 @@ function populateGameweekSelect() {
     });
 }
 
-/**
- * Заполняет select элемент списком команд
- * @param {HTMLSelectElement} selectElement
- * @param {string} placeholder - текст плейсхолдера
- */
-function fillTeamOptions(selectElement, placeholder) {
-    const teams = new Set();
-    scheduleData.schedule.forEach(gw => {
-        gw.matches.forEach(match => {
+function getTeamsList() {
+    if (_teamsList) return _teamsList;
+    var teams = new Set();
+    scheduleData.schedule.forEach(function(gw) {
+        gw.matches.forEach(function(match) {
             teams.add(match.home);
             teams.add(match.away);
         });
     });
+    _teamsList = Array.from(teams).sort();
+    return _teamsList;
+}
 
+function fillTeamOptions(selectElement, placeholder) {
+    var teams = getTeamsList();
     selectElement.innerHTML = '';
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = placeholder;
     selectElement.appendChild(defaultOption);
 
-    Array.from(teams).sort().forEach(team => {
+    teams.forEach(function(team) {
         const option = document.createElement('option');
         option.value = team;
         option.textContent = team;
@@ -175,7 +181,7 @@ function setupEventListeners() {
                     if (team) {
                         showTeamSchedule(team);
                     } else {
-                        document.getElementById('scheduleContainer').innerHTML =
+                        _scheduleContainer.innerHTML =
                             '<div class="no-matches">Выберите команду для просмотра расписания</div>';
                     }
                 }
@@ -227,9 +233,10 @@ function setupEventListeners() {
  * @returns {string}
  */
 function escapeHtml(str) {
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;');
 }
 
 /**
@@ -255,7 +262,7 @@ function showGameweek(gameweekNum) {
         '<div class="matches-grid gameweek-view">';
 
     var sortedMatches = gameweek.matches.slice().sort(function(a, b) {
-        return new Date(a.date.split('.').reverse().join('-')) - new Date(b.date.split('.').reverse().join('-'));
+        return parseDate(a.date) - parseDate(b.date);
     });
 
     sortedMatches.forEach(function(match) {
@@ -263,7 +270,7 @@ function showGameweek(gameweekNum) {
     });
 
     html += '</div>';
-    document.getElementById('scheduleContainer').innerHTML = html;
+    _scheduleContainer.innerHTML = html;
 }
 
 function showTeamSchedule(teamName) {
@@ -291,7 +298,7 @@ function showTeamSchedule(teamName) {
     });
 
     teamMatches.sort(function(a, b) {
-        return new Date(a.date.split('.').reverse().join('-')) - new Date(b.date.split('.').reverse().join('-'));
+        return parseDate(a.date) - parseDate(b.date);
     });
 
     // Применяем фильтр дома/гости
@@ -334,7 +341,7 @@ function showTeamSchedule(teamName) {
     }
 
     html += '</div>';
-    document.getElementById('scheduleContainer').innerHTML = html;
+    _scheduleContainer.innerHTML = html;
 }
 
 /**
@@ -531,59 +538,21 @@ function showStandingsTable() {
         '</div>' +
         '</div>';
 
-    document.getElementById('scheduleContainer').innerHTML = html;
-}
-
-/**
- * Fallback: генерирует первый тур из реальных данных расписания
- */
-function showStaticGameweek() {
-    if (!SCHEDULE_DATA || !SCHEDULE_DATA.schedule || SCHEDULE_DATA.schedule.length === 0) {
-        document.getElementById('scheduleContainer').innerHTML =
-            '<div class="no-matches">Не удалось загрузить расписание</div>';
-        return;
-    }
-
-    var gw = SCHEDULE_DATA.schedule[0];
-    var html = '<div class="gameweek-title">' +
-        '🏆 Тур ' + gw.gameweek + ' — ' + escapeHtml(gw.round) + ' (' + escapeHtml(gw.date) + ')' +
-        '</div>' +
-        '<div class="matches-grid gameweek-view">';
-
-    gw.matches.forEach(function(match) {
-        html += '<div class="match-card">' +
-            '<div class="match-teams">' +
-                '<div class="team home">' + escapeHtml(match.home) + '</div>' +
-                '<div class="vs">VS</div>' +
-                '<div class="team away">' + escapeHtml(match.away) + '</div>' +
-            '</div>' +
-            '<div class="match-info">' +
-                '<span><span class="icon">📅</span> ' + escapeHtml(match.day) + ', ' + escapeHtml(match.date) + '</span>' +
-                '<span><span class="icon">⏰</span> ' + escapeHtml(match.time) + '</span>' +
-                '<span><span class="icon">🏟️</span> ' + escapeHtml(match.hall) + '</span>' +
-                (match.address ? '<span><span class="icon">📍</span> ' + escapeHtml(match.address) + '</span>' : '') +
-            '</div>' +
-            '</div>';
-    });
-
-    html += '</div>';
-    document.getElementById('scheduleContainer').innerHTML = html;
+    _scheduleContainer.innerHTML = html;
 }
 
 // Parallax эффект для заголовка (через requestAnimationFrame)
 (function() {
     var ticking = false;
+    var h1 = document.querySelector('h1');
 
     window.addEventListener('scroll', function() {
         if (!ticking) {
             window.requestAnimationFrame(function() {
-                var h1 = document.querySelector('h1');
                 if (h1) {
                     var scrolled = window.pageYOffset;
-                    var parallaxSpeed = 0.5;
-                    h1.style.transform = 'translateY(' + (scrolled * parallaxSpeed) + 'px)';
-                    var opacity = Math.max(0.3, 1 - scrolled / 500);
-                    h1.style.opacity = opacity;
+                    h1.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
+                    h1.style.opacity = Math.max(0.3, 1 - scrolled / 500);
                 }
                 ticking = false;
             });
@@ -605,7 +574,7 @@ function returnToCurrentMode() {
         if (team) {
             showTeamSchedule(team);
         } else {
-            document.getElementById('scheduleContainer').innerHTML =
+            _scheduleContainer.innerHTML =
                 '<div class="no-matches">Выберите команду для просмотра расписания</div>';
         }
     } else {
@@ -620,12 +589,7 @@ function returnToCurrentMode() {
  * @param {Function} updateCallback - Функция обновления контента
  */
 function animateContentTransition(updateCallback) {
-    const container = document.getElementById('scheduleContainer');
-
-    if (!TRANSITION_CONFIG.enabled) {
-        updateCallback();
-        return;
-    }
+    const container = _scheduleContainer;
 
     // Фаза 1: Fade out
     container.classList.add('fade-out');
@@ -744,12 +708,7 @@ function animateControl(element, show) {
  * @param {Function} updateCallback - Функция обновления
  */
 function animateQuickTransition(updateCallback) {
-    const container = document.getElementById('scheduleContainer');
-
-    if (!TRANSITION_CONFIG.enabled) {
-        updateCallback();
-        return;
-    }
+    const container = _scheduleContainer;
 
     // Быстрый fade
     container.style.opacity = '0';

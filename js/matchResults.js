@@ -1,21 +1,6 @@
 // Данные результатов матчей волейбольной лиги
 const MATCH_RESULTS = {
     "tournament": "Волейбольный турнир 2026",
-    "scoring_system": {
-        "description": "Система подсчета очков",
-        "rules": {
-            "win_3_0": { "winner": 3, "loser": 0, "description": "Победа 3-0 → 3 очка" },
-            "win_2_1": { "winner": 2, "loser": 1, "description": "Победа 2-1 → 2 очка" },
-            "loss_1_2": { "winner": 2, "loser": 1, "description": "Поражение 1-2 → 1 очко" },
-            "loss_0_3": { "winner": 3, "loser": 0, "description": "Поражение 0-3 → 0 очков" }
-        }
-    },
-    "match_format": {
-        "total_sets": 3,
-        "points_per_set": 25,
-        "min_advantage": 2,
-        "description": "Всегда играется 3 партии"
-    },
     "results": [
         // Тур 1
         {"match_id": 1, "gameweek": 1, "home": "Макиато", "away": "Dream team", "played": true, "sets": {"home": 2, "away": 1}, "set_scores": [{ "home": 25, "away": 20 },{ "home": 17, "away": 25 },{ "home": 25, "away": 23 }], "points": {"home": 2, "away": 1}},
@@ -104,37 +89,4 @@ const MATCH_RESULTS = {
     ]
 };
 
-// Функция для расчета очков на основе счета по партиям
-function calculateMatchPoints(homeSets, awaySets) {
-    // Победа 3-0
-    if (homeSets === 3 && awaySets === 0) {
-        return { home: 3, away: 0 };
-    }
-    // Победа 2-1
-    else if (homeSets === 2 && awaySets === 1) {
-        return { home: 2, away: 1 };
-    }
-    // Поражение 1-2
-    else if (homeSets === 1 && awaySets === 2) {
-        return { home: 1, away: 2 };
-    }
-    // Поражение 0-3
-    else if (homeSets === 0 && awaySets === 3) {
-        return { home: 0, away: 3 };
-    }
-    return { home: 0, away: 0 };
-}
-
-// Функция для обновления результата матча
-function updateMatchResult(matchId, homeSets, awaySets, setScores) {
-    const match = MATCH_RESULTS.results.find(m => m.match_id === matchId);
-    if (!match) return null;
-
-    match.played = true;
-    match.sets = { home: homeSets, away: awaySets };
-    match.set_scores = setScores || [];
-    match.points = calculateMatchPoints(homeSets, awaySets);
-
-    return match;
-}
 

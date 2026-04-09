@@ -102,17 +102,6 @@
     padding: 10px 0;
 }
 
-/* ===== НИЖНЯЯ СЕТКА — линейная ===== */
-.bracket-grid {
-    display: grid;
-    grid-template-columns: 1fr 40px 1fr 40px 1fr;
-    grid-template-rows: auto;
-    align-items: stretch;
-    gap: 0;
-    position: relative;
-    padding: 10px 0;
-}
-
 /* ===== Колонки раундов ===== */
 .bracket-round {
     display: flex;
@@ -515,12 +504,6 @@
     border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
-.playoff-prize.silver {
-    background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.05));
-    color: #ccc;
-    border: 1px solid rgba(192, 192, 192, 0.3);
-}
-
 .playoff-prize.bronze {
     background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05));
     color: #cd7f32;
@@ -568,12 +551,6 @@
     transform: translateX(10px);
 }
 
-/* Нижняя сетка */
-.bracket-grid > .bracket-round:nth-child(1) .playoff-match:nth-child(1) { animation-delay: 0.1s; transform: translateX(-10px); }
-.bracket-grid > .bracket-round:nth-child(1) .playoff-match:nth-child(2) { animation-delay: 0.2s; transform: translateX(-10px); }
-.bracket-grid > .bracket-round:nth-child(3) .playoff-match:nth-child(1) { animation-delay: 0.3s; }
-.bracket-grid > .bracket-round:nth-child(3) .playoff-match:nth-child(2) { animation-delay: 0.4s; }
-
 @keyframes matchSlideIn {
     0% { opacity: 0; }
     100% { opacity: 1; transform: translate(0, 0); }
@@ -604,10 +581,6 @@
         grid-template-columns: 1fr 18px 0.8fr 18px auto 18px 0.8fr 18px 1fr;
     }
 
-    .bracket-grid {
-        grid-template-columns: 1fr 30px 1fr 30px 1fr;
-    }
-
     .bracket-trophy-column { min-width: 160px; padding: 0 4px; }
     .bracket-trophy { font-size: 2.6em; }
 
@@ -625,8 +598,7 @@
 
 /* Мобильный — вертикальная раскладка */
 @media (max-width: 640px) {
-    .bracket-grid-mirror,
-    .bracket-grid {
+    .bracket-grid-mirror {
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -691,15 +663,3 @@
     .playoff-team-name { font-size: 0.72em; }
 }
 
-/* ===== Reduced motion ===== */
-@media (prefers-reduced-motion: reduce) {
-    .playoff-container,
-    .playoff-bracket,
-    .playoff-match,
-    .finalist-card,
-    .bracket-trophy.has-winner {
-        animation: none;
-        opacity: 1;
-        transform: none;
-    }
-}
