@@ -1,21 +1,15 @@
 // Модуль для отображения сетки плей-офф (bracket-стиль)
 
 /**
- * Данные плей-офф матчей
+ * Сетка плей-офф и посев
  */
 var PLAYOFF_DATA = {
     matches: [
         // Верхняя сетка (за чемпионство)
-        { playoff_id: 'upper_semi_1', bracket: 'upper', round: 'semi', seed1: 1, seed2: 4, result: null },
-        { playoff_id: 'upper_semi_2', bracket: 'upper', round: 'semi', seed1: 2, seed2: 3, result: null },
-        { playoff_id: 'upper_final', bracket: 'upper', round: 'final', seed1: null, seed2: null, result: null },
-        { playoff_id: 'upper_third', bracket: 'upper', round: 'third', seed1: null, seed2: null, result: null },
-
-        // Нижняя сетка (5-8 места)
-        { playoff_id: 'lower_semi_1', bracket: 'lower', round: 'semi', seed1: 5, seed2: 8, result: null },
-        { playoff_id: 'lower_semi_2', bracket: 'lower', round: 'semi', seed1: 6, seed2: 7, result: null },
-        { playoff_id: 'lower_final', bracket: 'lower', round: 'final', seed1: null, seed2: null, result: null },
-        { playoff_id: 'lower_third', bracket: 'lower', round: 'third', seed1: null, seed2: null, result: null }
+        { playoff_id: 'upper_semi_1', bracket: 'upper', round: 'semi', seed1: 1, seed2: 4 },
+        { playoff_id: 'upper_semi_2', bracket: 'upper', round: 'semi', seed1: 2, seed2: 3 },
+        { playoff_id: 'upper_final', bracket: 'upper', round: 'final', seed1: null, seed2: null },
+        { playoff_id: 'upper_third', bracket: 'upper', round: 'third', seed1: null, seed2: null }
     ]
 };
 
@@ -25,8 +19,12 @@ function getTeamBySeed(standings, seed) {
 }
 
 function getPlayoffResult(playoffId) {
-    var match = PLAYOFF_DATA.matches.find(function(m) { return m.playoff_id === playoffId; });
-    return (match && match.result) ? match.result : null;
+    if (typeof PLAYOFF_RESULTS === 'undefined' || !PLAYOFF_RESULTS.matches) {
+        return null;
+    }
+
+    var match = PLAYOFF_RESULTS.matches.find(function(m) { return m.playoff_id === playoffId; });
+    return (match && match.played) ? match : null;
 }
 
 function determineBracketFinalists(standings, bracket) {
@@ -36,8 +34,8 @@ function determineBracketFinalists(standings, bracket) {
     var semi1 = PLAYOFF_DATA.matches.find(function(m) { return m.playoff_id === semi1Id; });
     var semi2 = PLAYOFF_DATA.matches.find(function(m) { return m.playoff_id === semi2Id; });
 
-    var semi1Result = semi1 ? semi1.result : null;
-    var semi2Result = semi2 ? semi2.result : null;
+    var semi1Result = semi1 ? getPlayoffResult(semi1Id) : null;
+    var semi2Result = semi2 ? getPlayoffResult(semi2Id) : null;
 
     var team1 = getTeamBySeed(standings, semi1 ? semi1.seed1 : null);
     var team2 = getTeamBySeed(standings, semi1 ? semi1.seed2 : null);
@@ -283,124 +281,6 @@ function createUpperBracketHtml(standings) {
     return html;
 }
 
-
-// ====================================================================
-//  НИЖНЯЯ СЕТКА — ЗЕРКАЛЬНЫЙ BRACKET (5–8 места, как верхняя)
-//  9 колонок: ПФ1 → линии → Финалист 1 → линии → Центр → линии → Финалист 2 → линии → ПФ2
-// ====================================================================
-
-function createLowerBracketHtml(standings) {
-    var bracket = 'lower';
-
-    var semi1Seeds = [5, 8];
-    var semi2Seeds = [6, 7];
-
-    var team1 = getTeamBySeed(standings, semi1Seeds[0]);
-    var team2 = getTeamBySeed(standings, semi1Seeds[1]);
-    var team3 = getTeamBySeed(standings, semi2Seeds[0]);
-    var team4 = getTeamBySeed(standings, semi2Seeds[1]);
-
-    var semi1Result = getPlayoffResult('lower_semi_1');
-    var semi2Result = getPlayoffResult('lower_semi_2');
-    var finalResult = getPlayoffResult('lower_final');
-    var thirdResult = getPlayoffResult('lower_third');
-
-    var finalists = determineBracketFinalists(standings, bracket);
-
-    var finalSeed1 = finalists.finalTeam1 ? (standings.indexOf(finalists.finalTeam1) + 1) : null;
-    var finalSeed2 = finalists.finalTeam2 ? (standings.indexOf(finalists.finalTeam2) + 1) : null;
-    var thirdSeed1 = finalists.thirdTeam1 ? (standings.indexOf(finalists.thirdTeam1) + 1) : null;
-    var thirdSeed2 = finalists.thirdTeam2 ? (standings.indexOf(finalists.thirdTeam2) + 1) : null;
-
-    // === HTML ===
-    var html = '<div class="playoff-bracket">' +
-        '<div class="bracket-header lower">Малый плей-офф</div>' +
-        '<div class="bracket-grid-mirror">';
-
-    // --- Кол. 1: Полуфинал 1 (слева) ---
-    html += '<div class="bracket-round bracket-col-semi-left">' +
-        '<div class="round-title">Полуфинал</div>' +
-        '<div class="round-matches">' +
-        createPlayoffMatchHtml(team1, team2, semi1Seeds[0], semi1Seeds[1], semi1Result, null, '') +
-        '</div></div>';
-
-    // --- Кол. 2: Соединитель ПФ1 → Финалист 1 ---
-    html += '<div class="bracket-connectors" id="conn-lower-left"></div>';
-
-    // --- Кол. 3: Финалист 1 (победитель ПФ1) ---
-    html += '<div class="bracket-round bracket-col-finalist">' +
-        '<div class="round-title">Финалист</div>' +
-        '<div class="round-matches">' +
-        createFinalistCard(finalists.finalTeam1, finalSeed1, 'Финалист', 'left') +
-        '</div></div>';
-
-    // --- Кол. 4: Соединитель Финалист 1 → Центр ---
-    html += '<div class="bracket-connectors" id="conn-lower-center-left"></div>';
-
-    // --- Кол. 5: ЦЕНТР — Матчи за 5-е и 7-е места ---
-    html += '<div class="bracket-trophy-column lower-center">';
-
-    // Матч за 5-е место
-    html += '<div class="center-match-section">' +
-        '<div class="round-title">Матч за 5-е место</div>' +
-        createPlayoffMatchHtml(finalists.finalTeam1, finalists.finalTeam2, finalSeed1, finalSeed2, finalResult,
-            null, 'lower-final-match') +
-        '</div>';
-
-    // Матч за 7-е место
-    html += '<div class="center-match-section third-place-section">' +
-        '<div class="round-title">Матч за 7-е место</div>' +
-        createPlayoffMatchHtml(finalists.thirdTeam1, finalists.thirdTeam2, thirdSeed1, thirdSeed2, thirdResult,
-            null, 'lower-seventh-match') +
-        '</div>';
-
-    html += '</div>'; // bracket-trophy-column
-
-    // --- Кол. 6: Соединитель Центр → Финалист 2 ---
-    html += '<div class="bracket-connectors conn-right" id="conn-lower-center-right"></div>';
-
-    // --- Кол. 7: Финалист 2 (победитель ПФ2) ---
-    html += '<div class="bracket-round bracket-col-finalist">' +
-        '<div class="round-title">Финалист</div>' +
-        '<div class="round-matches">' +
-        createFinalistCard(finalists.finalTeam2, finalSeed2, 'Финалист', 'right') +
-        '</div></div>';
-
-    // --- Кол. 8: Соединитель Финалист 2 → ПФ2 ---
-    html += '<div class="bracket-connectors conn-right" id="conn-lower-right"></div>';
-
-    // --- Кол. 9: Полуфинал 2 (справа) ---
-    html += '<div class="bracket-round bracket-col-semi-right">' +
-        '<div class="round-title">Полуфинал</div>' +
-        '<div class="round-matches">' +
-        createPlayoffMatchHtml(team3, team4, semi2Seeds[0], semi2Seeds[1], semi2Result, null, '') +
-        '</div></div>';
-
-    html += '</div>'; // bracket-grid-mirror
-
-    // Результаты (если матчи сыграны)
-    var resultsHtml = '';
-    if (finalResult) {
-        var fifthPlace = finalResult.sets.home > finalResult.sets.away ? finalists.finalTeam1 : finalists.finalTeam2;
-        if (fifthPlace) {
-            resultsHtml += '<div class="playoff-prize lower-result"><span>5-е место</span> — <strong>' + escapeHtml(fifthPlace.team) + '</strong></div>';
-        }
-    }
-    if (thirdResult) {
-        var seventhPlace = thirdResult.sets.home > thirdResult.sets.away ? finalists.thirdTeam1 : finalists.thirdTeam2;
-        if (seventhPlace) {
-            resultsHtml += '<div class="playoff-prize lower-result"><span>7-е место</span> — <strong>' + escapeHtml(seventhPlace.team) + '</strong></div>';
-        }
-    }
-    if (resultsHtml) {
-        html += '<div class="playoff-prizes">' + resultsHtml + '</div>';
-    }
-
-    html += '</div>'; // playoff-bracket
-    return html;
-}
-
-
 // ====================================================================
 //  SVG-СОЕДИНИТЕЛИ
 // ====================================================================
@@ -515,66 +395,6 @@ function drawTrophyConnector(containerId, side) {
     container.innerHTML = svg;
 }
 
-/**
- * Нижняя сетка — соединители (такие же, как у верхней)
- */
-function drawLowerBracketConnectors() {
-    drawMirrorConnector('conn-lower-left', 'left');
-    drawMirrorConnector('conn-lower-right', 'right');
-    drawLowerCenterConnector('conn-lower-center-left', 'left');
-    drawLowerCenterConnector('conn-lower-center-right', 'right');
-}
-
-/**
- * Соединитель: Финалист ↔ Центр (для нижней сетки)
- */
-function drawLowerCenterConnector(containerId, side) {
-    var container = document.getElementById(containerId);
-    if (!container) return;
-
-    var grid = container.closest('.bracket-grid-mirror');
-    if (!grid) return;
-
-    // Находим финалиста и центральный матч (за 5-е место)
-    var finalistEl;
-    var finalistCols = grid.querySelectorAll('.bracket-col-finalist');
-    if (side === 'left') {
-        finalistEl = finalistCols[0] ? finalistCols[0].querySelector('.finalist-card') : null;
-    } else {
-        finalistEl = finalistCols[1] ? finalistCols[1].querySelector('.finalist-card') : null;
-    }
-
-    var centerMatch = grid.querySelector('.bracket-trophy-column .center-match-section .playoff-match');
-
-    if (!finalistEl || !centerMatch) return;
-
-    var connRect = container.getBoundingClientRect();
-    if (connRect.width === 0 || connRect.height === 0) return;
-
-    var finalistRect = finalistEl.getBoundingClientRect();
-    var centerRect = centerMatch.getBoundingClientRect();
-
-    var finalistY = (finalistRect.top + finalistRect.height / 2) - connRect.top;
-    var centerY = (centerRect.top + centerRect.height / 2) - connRect.top;
-
-    var w = connRect.width;
-    var midX = w / 2;
-
-    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + connRect.height + '" style="position:absolute;top:0;left:0;">';
-
-    if (side === 'left') {
-        svg += '<path d="M 0 ' + finalistY + ' L ' + midX + ' ' + finalistY + ' L ' + midX + ' ' + centerY + ' L ' + w + ' ' + centerY + '" ' +
-            'stroke="rgba(0,212,255,0.3)" stroke-width="2" fill="none" />';
-    } else {
-        svg += '<path d="M ' + w + ' ' + finalistY + ' L ' + midX + ' ' + finalistY + ' L ' + midX + ' ' + centerY + ' L 0 ' + centerY + '" ' +
-            'stroke="rgba(0,212,255,0.3)" stroke-width="2" fill="none" />';
-    }
-
-    svg += '</svg>';
-    container.innerHTML = svg;
-}
-
-
 // ====================================================================
 //  ГЛАВНАЯ ФУНКЦИЯ
 // ====================================================================
@@ -590,25 +410,21 @@ function showPlayoff() {
 
     if (totalPlayedMatches < totalMatches) {
         html += '<div class="playoff-subtitle">' +
-            'Сетка формируется по итогам регулярного сезона. Сыграно ' + totalPlayedMatches + ' из ' + totalMatches + ' матчей.' +
+            'Плей-офф за 1-4 места формируется по итогам регулярного сезона. Сыграно ' + totalPlayedMatches + ' из ' + totalMatches + ' матчей.' +
             '</div>';
     } else {
         html += '<div class="playoff-subtitle">' +
-            'Регулярный сезон завершён. Пары определены по итоговой таблице.' +
+            'Регулярный сезон завершён. Пары плей-офф за 1-4 места определены по итоговой таблице.' +
             '</div>';
     }
 
     // Верхняя сетка — зеркальная (трофей по центру)
     html += createUpperBracketHtml(standings);
 
-    // Нижняя сетка — линейная
-    html += createLowerBracketHtml(standings);
-
     // Пояснение
     html += '<div class="playoff-info-box">' +
-        '<p><strong>🥇 Золотой путь</strong> — команды с 1 по 4 место таблицы. Первый полуфинал: 1-е vs 4-е, Второй полуфинал: 2-е vs 3-е. Финалисты разыгрывают чемпионство в Золотом матче.</p>' +
-        '<p><strong>🔹 Малый плей-офф</strong> — команды с 5 по 8 место. Полуфиналы: 5-е vs 8-е, 6-е vs 7-е.</p>' +
-        '<p>Проигравшие полуфиналов разыгрывают 3-е (7-е) место в Бронзовом матче (матче за 7-е место).</p>' +
+        '<p><strong>🥇 Золотой путь</strong> — команды с 1 по 4 место таблицы. Полуфиналы: 1-е vs 4-е и 2-е vs 3-е. Победители выходят в золотой матч, проигравшие играют за 3-е место.</p>' +
+        '<p>Команды, занявшие места с 5-го по 8-е, завершают сезон по итогам регулярного чемпионата без отдельной нижней сетки плей-офф.</p>' +
         '</div>';
 
     html += '</div>';
@@ -618,7 +434,6 @@ function showPlayoff() {
     requestAnimationFrame(function() {
         requestAnimationFrame(function() {
             drawUpperBracketConnectors();
-            drawLowerBracketConnectors();
         });
     });
 }
@@ -630,6 +445,5 @@ window.addEventListener('resize', function() {
     clearTimeout(_playoffResizeTimer);
     _playoffResizeTimer = setTimeout(function() {
         drawUpperBracketConnectors();
-        drawLowerBracketConnectors();
     }, 150);
 });
