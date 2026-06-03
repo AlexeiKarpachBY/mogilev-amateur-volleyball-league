@@ -15,10 +15,10 @@ const PLAYOFF_RESULTS = {
     "tournament": "Плей-офф 2026",
     "matches": [
         // Полуфинал: 1-е место vs 4-е место
-        {"playoff_id": "upper_semi_1", "played": false, "sets": {"home": null, "away": null}, "set_scores": []},
+        {"playoff_id": "upper_semi_1", "played": true, "sets": {"home": 2, "away": 0}, "set_scores": []},
 
         // Полуфинал: 2-е место vs 3-е место
-        {"playoff_id": "upper_semi_2", "played": false, "sets": {"home": null, "away": null}, "set_scores": []},
+        {"playoff_id": "upper_semi_2", "played": true, "sets": {"home": 2, "away": 1}, "set_scores": []},
 
         // Золотой матч
         {"playoff_id": "upper_final", "played": false, "sets": {"home": null, "away": null}, "set_scores": []},
