@@ -24,7 +24,7 @@ const PLAYOFF_RESULTS = {
         {"playoff_id": "upper_final", "played": false, "sets": {"home": null, "away": null}, "set_scores": []},
 
         // Матч за 3-е место
-        {"playoff_id": "upper_third", "played": false, "sets": {"home": null, "away": null}, "set_scores": []}
+        {"playoff_id": "upper_third", "played": true, "sets": {"home": 2, "away": 1}, "set_scores": []}
     ]
 };
 
