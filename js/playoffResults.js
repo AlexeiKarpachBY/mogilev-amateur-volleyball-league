@@ -21,7 +21,7 @@ const PLAYOFF_RESULTS = {
         {"playoff_id": "upper_semi_2", "played": true, "sets": {"home": 2, "away": 1}, "set_scores": []},
 
         // Золотой матч
-        {"playoff_id": "upper_final", "played": false, "sets": {"home": null, "away": null}, "set_scores": []},
+        {"playoff_id": "upper_final", "played": true, "sets": {"home": 2, "away": 0}, "set_scores": []},
 
         // Матч за 3-е место
         {"playoff_id": "upper_third", "played": true, "sets": {"home": 2, "away": 1}, "set_scores": []}
